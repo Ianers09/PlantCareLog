@@ -1,0 +1,96 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · PlantCareLog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+  body{ background: var(--paper); }
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 1.1rem 2rem; background: var(--forest); color: var(--paper);
+  }
+  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size: 1.15rem; }
+  .topbar nav{ display:flex; align-items:center; gap: 1.4rem; font-size: 0.88rem; }
+  .topbar nav a{ color: var(--sage); }
+  .topbar nav a:hover{ color: var(--paper); }
+  .topbar .signout{
+    background: transparent; border: 1px solid var(--sage); color: var(--paper);
+    padding: 0.4rem 0.85rem; border-radius: 6px; font-size: 0.82rem; cursor:pointer;
+  }
+  .topbar .signout:hover{ background: rgba(255,255,255,0.08); }
+
+  main{ max-width: 900px; margin: 0 auto; padding: 2.6rem 2rem 4rem; }
+
+  main h1{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.9rem; margin: 0 0 0.3rem 0; }
+  main .sub{ color: var(--ink-soft); margin: 0 0 2rem 0; }
+
+  .cards{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2.2rem; }
+  .stat-card{
+    background: #fff; border: 1px solid var(--paper-dim); border-radius: 10px;
+    padding: 1.2rem 1.3rem;
+  }
+  .stat-card .label{
+    font-family:'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .stat-card .value{ font-family:'Fraunces', serif; font-size: 1.7rem; margin-top: 0.3rem; }
+
+  .empty-state{
+    border: 1.5px dashed var(--paper-dim); border-radius: 10px;
+    padding: 2.4rem; text-align:center; color: var(--ink-soft);
+  }
+  .empty-state h2{ font-family:'Fraunces', serif; color: var(--ink); font-weight:500; margin: 0 0 0.4rem 0; }
+  .empty-state p{ font-size: 0.92rem; margin: 0; }
+
+  @media (max-width: 640px){
+    .cards{ grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">PlantCareLog</div>
+  <nav>
+    <span>{{ user.username }}</span>
+    {% if user.is_staff %}<a href="{% url 'admin_dashboard' %}">Admin dashboard</a>{% endif %}
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="signout">Sign out</button>
+    </form>
+  </nav>
+</div>
+
+<main>
+  <h1>Welcome back, {{ user.first_name|default:user.username }}.</h1>
+  <p class="sub">Here's where your plant collection will live once you start logging.</p>
+
+  <div class="cards">
+    <div class="stat-card">
+      <div class="label">Plants tracked</div>
+      <div class="value">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Due today</div>
+      <div class="value">0</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Care streak</div>
+      <div class="value">0 days</div>
+    </div>
+  </div>
+
+  <div class="empty-state">
+    <h2>No plants logged yet</h2>
+    <p>Once the plant-tracking feature is connected, your watering schedule and care history will show up here.</p>
+  </div>
+</main>
+
+</body>
+</html>

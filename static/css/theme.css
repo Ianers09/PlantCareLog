@@ -1,0 +1,105 @@
+/* PlantCareLog shared theme
+   Fonts: Fraunces (display) / Inter (body) / JetBrains Mono (utility) */
+
+:root{
+  --forest: #1c3326;
+  --forest-deep: #142419;
+  --sage: #9db594;
+  --paper: #f6f2e8;
+  --paper-dim: #ece5d5;
+  --moss: #47623f;
+  --moss-dark: #364d30;
+  --clay: #c17a4a;
+  --clay-soft: #e7c3a5;
+  --ink: #21261f;
+  --ink-soft: #5b6156;
+  --danger: #a4442f;
+  --danger-bg: #f6e5df;
+  --success: #3f6b3a;
+  --success-bg: #e6ede0;
+}
+
+*{ box-sizing: border-box; }
+html, body{ margin:0; padding:0; }
+
+body{
+  font-family: 'Inter', sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100vh;
+}
+
+a{ color: var(--moss-dark); text-decoration: none; font-weight: 500; }
+a:hover{ text-decoration: underline; }
+a:focus-visible, button:focus-visible, input:focus-visible{
+  outline: 2px solid var(--clay);
+  outline-offset: 2px;
+}
+
+/* ---------- Form fields (shared by login / register) ---------- */
+.field{ margin-bottom: 1.05rem; }
+.field label{
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+  display:block;
+  margin-bottom: 0.4rem;
+}
+.field input{
+  width:100%;
+  padding: 0.72rem 0.85rem;
+  font-family:'Inter', sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--paper-dim);
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.field input::placeholder{ color: #9a9384; }
+.field input:focus{ border-color: var(--moss); background: #fdfbf6; }
+.field .help-text{ font-size: 0.76rem; color: var(--ink-soft); margin-top: 0.35rem; }
+.field .errorlist{
+  list-style:none; margin: 0.4rem 0 0 0; padding:0;
+  font-size: 0.8rem; color: var(--danger);
+}
+
+.btn-primary{
+  width:100%;
+  margin-top: 0.4rem;
+  padding: 0.82rem 1rem;
+  background: var(--moss);
+  color: var(--paper);
+  font-family:'Inter', sans-serif;
+  font-size: 0.96rem;
+  font-weight: 600;
+  border:none;
+  border-radius: 8px;
+  cursor:pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+.btn-primary:hover{ background: var(--moss-dark); }
+.btn-primary:active{ transform: translateY(1px); }
+
+/* ---------- Alerts / Django messages ---------- */
+.alert{
+  padding: 0.7rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  margin-bottom: 1rem;
+}
+.alert-success{ background: var(--success-bg); color: var(--success); }
+.alert-error{ background: var(--danger-bg); color: var(--danger); }
+.alert-info{ background: var(--paper-dim); color: var(--ink-soft); }
+
+.nonfield-errors{
+  list-style:none; margin:0 0 1rem 0; padding: 0.7rem 0.9rem;
+  background: var(--danger-bg); color: var(--danger);
+  border-radius: 8px; font-size: 0.86rem;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+}

@@ -1,0 +1,153 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard · PlantCareLog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+  body{ background: var(--paper); }
+
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 1.1rem 2rem; background: var(--forest-deep); color: var(--paper);
+  }
+  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size: 1.15rem; }
+  .topbar .brand .tag{
+    font-family:'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--clay-soft);
+    margin-left: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .topbar nav{ display:flex; align-items:center; gap: 1.4rem; font-size: 0.88rem; }
+  .topbar nav a{ color: var(--sage); }
+  .topbar nav a:hover{ color: var(--paper); }
+  .topbar .signout{
+    background: transparent; border: 1px solid var(--sage); color: var(--paper);
+    padding: 0.4rem 0.85rem; border-radius: 6px; font-size: 0.82rem; cursor:pointer;
+  }
+  .topbar .signout:hover{ background: rgba(255,255,255,0.08); }
+
+  main{ max-width: 1000px; margin: 0 auto; padding: 2.6rem 2rem 4rem; }
+  main h1{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.9rem; margin: 0 0 0.3rem 0; }
+  main .sub{ color: var(--ink-soft); margin: 0 0 2.2rem 0; }
+
+  .cards{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2.4rem; }
+  .stat-card{
+    background: #fff; border: 1px solid var(--paper-dim); border-radius: 10px;
+    padding: 1.2rem 1.3rem;
+  }
+  .stat-card .label{
+    font-family:'JetBrains Mono', monospace; font-size: 0.7rem; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .stat-card .value{ font-family:'Fraunces', serif; font-size: 1.9rem; margin-top: 0.3rem; color: var(--moss-dark); }
+
+  .panel{
+    background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px;
+    padding: 1.5rem 1.6rem; margin-bottom: 1.6rem;
+  }
+  .panel h2{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.2rem; margin: 0 0 1rem 0; }
+
+  table{ width:100%; border-collapse: collapse; font-size: 0.88rem; }
+  th{
+    text-align:left; font-family:'JetBrains Mono', monospace; font-size: 0.68rem;
+    letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft);
+    padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--paper-dim);
+  }
+  td{ padding: 0.6rem 0.6rem; border-bottom: 1px solid var(--paper-dim); }
+  tr:last-child td{ border-bottom: none; }
+
+  .badge{
+    display:inline-block; padding: 0.15rem 0.5rem; border-radius: 999px;
+    font-size: 0.72rem; font-weight: 600;
+  }
+  .badge-active{ background: var(--success-bg); color: var(--success); }
+  .badge-inactive{ background: var(--danger-bg); color: var(--danger); }
+  .badge-staff{ background: var(--clay-soft); color: #6b3d1c; }
+
+  .menu-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap: 0.5rem; }
+  .menu-list a{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 0.7rem 0.9rem; background: var(--paper-dim); border-radius: 8px;
+    color: var(--ink); font-weight:500; font-size: 0.9rem;
+  }
+  .menu-list a:hover{ background: var(--sage); color: var(--forest-deep); text-decoration:none; }
+  .menu-list .arrow{ color: var(--ink-soft); }
+
+  @media (max-width: 720px){
+    .cards{ grid-template-columns: 1fr; }
+    table{ font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">PlantCareLog <span class="tag">Admin</span></div>
+  <nav>
+    <a href="{% url 'dashboard' %}">User view</a>
+    <span>{{ user.username }}</span>
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="signout">Sign out</button>
+    </form>
+  </nav>
+</div>
+
+<main>
+  <h1>Admin dashboard</h1>
+  <p class="sub">A quick-glance overview of PlantCareLog's user base, separate from the Django admin.</p>
+
+  <div class="cards">
+    <div class="stat-card">
+      <div class="label">Total users</div>
+      <div class="value">{{ total_users }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Active users</div>
+      <div class="value">{{ active_users }}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Staff accounts</div>
+      <div class="value">{{ staff_users }}</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Recently joined</h2>
+    <table>
+      <thead>
+        <tr><th>Username</th><th>Email</th><th>Joined</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        {% for u in recent_users %}
+        <tr>
+          <td>{{ u.username }}</td>
+          <td>{{ u.email|default:"—" }}</td>
+          <td>{{ u.date_joined|date:"M d, Y" }}</td>
+          <td>
+            {% if u.is_active %}<span class="badge badge-active">Active</span>{% else %}<span class="badge badge-inactive">Inactive</span>{% endif %}
+            {% if u.is_staff %}<span class="badge badge-staff">Staff</span>{% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No users yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h2>Quick links</h2>
+    <ul class="menu-list">
+      <li><a href="/admin/">Django admin (manage all models) <span class="arrow">→</span></a></li>
+      <li><a href="/admin/auth/user/">Manage users <span class="arrow">→</span></a></li>
+      <li><a href="{% url 'dashboard' %}">View site as a regular user <span class="arrow">→</span></a></li>
+    </ul>
+  </div>
+</main>
+
+</body>
+</html>

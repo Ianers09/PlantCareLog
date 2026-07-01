@@ -1,0 +1,134 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create account · PlantCareLog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+  .page{ display:flex; width:100%; min-height:100vh; }
+
+  .brand-panel{
+    position:relative; flex: 1 1 46%;
+    background: radial-gradient(120% 120% at 85% 90%, var(--forest) 0%, var(--forest-deep) 70%);
+    color: var(--paper);
+    display:flex; flex-direction:column; justify-content: space-between;
+    padding: 3.2rem 3rem; overflow:hidden;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--sage);
+  }
+  .brand-copy{ max-width: 26rem; margin-top: 2.4rem; }
+  .brand-copy h1{
+    font-family:'Fraunces', serif; font-weight: 500;
+    font-size: clamp(2rem, 3.4vw, 2.7rem); line-height: 1.18;
+    margin: 0 0 1rem 0; letter-spacing: -0.01em;
+  }
+  .brand-copy p{ font-size: 0.98rem; line-height: 1.6; color: var(--sage); margin: 0; }
+
+  .seed-list{ list-style:none; margin: 2rem 0 0 0; padding:0; display:flex; flex-direction:column; gap: 0.85rem; }
+  .seed-list li{
+    display:flex; align-items:center; gap: 0.6rem;
+    font-size: 0.88rem; color: var(--sage);
+  }
+  .seed-list svg{ width:16px; height:16px; flex-shrink:0; stroke: var(--clay); fill:none; stroke-width:1.6; }
+
+  .form-panel{ flex: 1 1 54%; display:flex; align-items:center; justify-content:center; padding: 2.5rem; }
+  .card{ width:100%; max-width: 380px; }
+  .card h2{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.9rem; margin: 0 0 0.4rem 0; }
+  .card > p.sub{ margin: 0 0 2rem 0; color: var(--ink-soft); font-size: 0.94rem; }
+
+  form{ display:flex; flex-direction:column; }
+  .footer-note{ text-align:center; font-size: 0.88rem; color: var(--ink-soft); margin-top: 1.6rem; }
+
+  @media (max-width: 860px){
+    .page{ flex-direction: column; }
+    .brand-panel{ min-height: 200px; padding: 2rem; }
+    .seed-list{ display:none; }
+    .form-panel{ padding: 2rem 1.4rem 3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="brand-panel">
+    <div class="eyebrow">PlantCareLog</div>
+    <div class="brand-copy">
+      <h1>Start a log for every plant you keep.</h1>
+      <p>Create an account to track watering, log growth, and never guess when you last fed your ferns.</p>
+    </div>
+    <ul class="seed-list">
+      <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg> Free to create, no card needed</li>
+      <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg> One login for your whole collection</li>
+      <li><svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 6"/></svg> Your data stays yours</li>
+    </ul>
+  </div>
+
+  <div class="form-panel">
+    <div class="card">
+      <h2>Create your account</h2>
+      <p class="sub">A minute of setup, seasons of well-timed watering.</p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <ul class="nonfield-errors">
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+
+        <div class="field">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <ul class="errorlist">{% for e in form.email.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.password1.id_for_label }}">Password</label>
+          {{ form.password1 }}
+          {% if form.password1.help_text %}<p class="help-text">{{ form.password1.help_text|safe }}</p>{% endif %}
+          {% if form.password1.errors %}
+            <ul class="errorlist">{% for e in form.password1.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label for="{{ form.password2.id_for_label }}">Confirm password</label>
+          {{ form.password2 }}
+          {% if form.password2.errors %}
+            <ul class="errorlist">{% for e in form.password2.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+
+        <button type="submit" class="btn-primary">Create account</button>
+      </form>
+
+      <p class="footer-note">Already have an account? <a href="{% url 'login' %}">Sign in</a></p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

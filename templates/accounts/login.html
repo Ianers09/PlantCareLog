@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,251 +7,62 @@
 <title>Sign in · PlantCareLog</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
 <style>
-  :root{
-    --forest: #1c3326;
-    --forest-deep: #142419;
-    --sage: #9db594;
-    --paper: #f6f2e8;
-    --paper-dim: #ece5d5;
-    --moss: #47623f;
-    --moss-dark: #364d30;
-    --clay: #c17a4a;
-    --ink: #21261f;
-    --ink-soft: #5b6156;
-  }
+  .page{ display:flex; width:100%; min-height:100vh; }
 
-  *{ box-sizing: border-box; }
-  html, body{ margin:0; padding:0; }
-
-  body{
-    font-family: 'Inter', sans-serif;
-    color: var(--ink);
-    background: var(--paper);
-    min-height: 100vh;
-    display:flex;
-  }
-
-  .page{
-    display:flex;
-    width:100%;
-    min-height:100vh;
-  }
-
-  /* ---------- Brand panel ---------- */
   .brand-panel{
-    position:relative;
-    flex: 1 1 46%;
+    position:relative; flex: 1 1 46%;
     background: radial-gradient(120% 120% at 15% 10%, var(--forest) 0%, var(--forest-deep) 70%);
     color: var(--paper);
-    display:flex;
-    flex-direction:column;
-    justify-content: space-between;
-    padding: 3.2rem 3rem;
-    overflow:hidden;
+    display:flex; flex-direction:column; justify-content: space-between;
+    padding: 3.2rem 3rem; overflow:hidden;
   }
-
   .eyebrow{
-    font-family:'JetBrains Mono', monospace;
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--sage);
+    font-family:'JetBrains Mono', monospace; font-size: 0.72rem;
+    letter-spacing: 0.18em; text-transform: uppercase; color: var(--sage);
   }
-
-  .brand-copy{
-    max-width: 26rem;
-    margin-top: 2.4rem;
-  }
-
+  .brand-copy{ max-width: 26rem; margin-top: 2.4rem; }
   .brand-copy h1{
-    font-family:'Fraunces', serif;
-    font-weight: 500;
-    font-size: clamp(2rem, 3.4vw, 2.7rem);
-    line-height: 1.18;
-    margin: 0 0 1rem 0;
-    letter-spacing: -0.01em;
+    font-family:'Fraunces', serif; font-weight: 500;
+    font-size: clamp(2rem, 3.4vw, 2.7rem); line-height: 1.18;
+    margin: 0 0 1rem 0; letter-spacing: -0.01em;
   }
+  .brand-copy p{ font-size: 0.98rem; line-height: 1.6; color: var(--sage); margin: 0; }
 
-  .brand-copy p{
-    font-size: 0.98rem;
-    line-height: 1.6;
-    color: var(--sage);
-    margin: 0;
-  }
-
-  .frond-wrap{
-    position:absolute;
-    right: -4%;
-    bottom: -2%;
-    width: 78%;
-    max-width: 460px;
-    opacity: 0.95;
-  }
-
+  .frond-wrap{ position:absolute; right: -4%; bottom: -2%; width: 78%; max-width: 460px; opacity: 0.95; }
   .frond-line{
-    fill:none;
-    stroke: var(--sage);
-    stroke-width: 1.6;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 900;
-    stroke-dashoffset: 900;
+    fill:none; stroke: var(--sage); stroke-width: 1.6;
+    stroke-linecap: round; stroke-linejoin: round;
+    stroke-dasharray: 900; stroke-dashoffset: 900;
     animation: grow 2.6s ease-out forwards 0.3s;
   }
   .frond-line.thin{ stroke-width: 1; opacity: 0.7; }
-
-  @keyframes grow{
-    to{ stroke-dashoffset: 0; }
-  }
+  @keyframes grow{ to{ stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce){ .frond-line{ animation: none; stroke-dashoffset: 0; } }
 
   .streak{
-    display:flex;
-    align-items:center;
-    gap: 0.6rem;
-    font-family:'JetBrains Mono', monospace;
-    font-size: 0.78rem;
-    color: var(--sage);
-    letter-spacing: 0.02em;
+    display:flex; align-items:center; gap: 0.6rem;
+    font-family:'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--sage);
   }
   .streak svg{ width:14px; height:14px; }
   .streak .rings{ stroke: var(--clay); }
 
-  /* ---------- Form panel ---------- */
-  .form-panel{
-    flex: 1 1 54%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding: 2.5rem;
-    background: var(--paper);
-  }
+  .form-panel{ flex: 1 1 54%; display:flex; align-items:center; justify-content:center; padding: 2.5rem; }
+  .card{ width:100%; max-width: 380px; }
+  .card h2{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.9rem; margin: 0 0 0.4rem 0; }
+  .card > p.sub{ margin: 0 0 2rem 0; color: var(--ink-soft); font-size: 0.94rem; }
 
-  .card{
-    width:100%;
-    max-width: 380px;
-  }
-
-  .card h2{
-    font-family:'Fraunces', serif;
-    font-weight: 500;
-    font-size: 1.9rem;
-    margin: 0 0 0.4rem 0;
-    color: var(--ink);
-  }
-
-  .card > p.sub{
-    margin: 0 0 2.2rem 0;
-    color: var(--ink-soft);
-    font-size: 0.94rem;
-  }
-
-  form{ display:flex; flex-direction:column; gap: 1.15rem; }
-
-  label{
-    font-size: 0.78rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--ink);
-    display:block;
-    margin-bottom: 0.4rem;
-  }
-
-  .field input{
-    width:100%;
-    padding: 0.72rem 0.85rem;
-    font-family:'Inter', sans-serif;
-    font-size: 0.95rem;
-    color: var(--ink);
-    background: var(--paper-dim);
-    border: 1.5px solid transparent;
-    border-radius: 8px;
-    outline: none;
-    transition: border-color 0.15s ease, background 0.15s ease;
-  }
-
-  .field input::placeholder{ color: #9a9384; }
-
-  .field input:focus{
-    border-color: var(--moss);
-    background: #fdfbf6;
-  }
-  .field input:focus-visible{
-    outline: 2px solid var(--clay);
-    outline-offset: 1px;
-  }
+  form{ display:flex; flex-direction:column; }
 
   .row-between{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    font-size: 0.85rem;
-    margin-top: -0.2rem;
+    display:flex; align-items:center; justify-content:space-between;
+    font-size: 0.85rem; margin: -0.3rem 0 1.1rem 0;
   }
+  .remember{ display:flex; align-items:center; gap: 0.5rem; color: var(--ink-soft); }
+  .remember input[type="checkbox"]{ width: 15px; height:15px; accent-color: var(--moss); }
 
-  .remember{
-    display:flex;
-    align-items:center;
-    gap: 0.5rem;
-    color: var(--ink-soft);
-  }
-  .remember input[type="checkbox"]{
-    width: 15px; height:15px;
-    accent-color: var(--moss);
-  }
-
-  a{
-    color: var(--moss-dark);
-    text-decoration: none;
-    font-weight: 500;
-  }
-  a:hover{ text-decoration: underline; }
-  a:focus-visible, button:focus-visible{
-    outline: 2px solid var(--clay);
-    outline-offset: 2px;
-  }
-
-  button.submit{
-    margin-top: 0.4rem;
-    padding: 0.82rem 1rem;
-    background: var(--moss);
-    color: var(--paper);
-    font-family:'Inter', sans-serif;
-    font-size: 0.96rem;
-    font-weight: 600;
-    border:none;
-    border-radius: 8px;
-    cursor:pointer;
-    transition: background 0.15s ease, transform 0.1s ease;
-  }
-  button.submit:hover{ background: var(--moss-dark); }
-  button.submit:active{ transform: translateY(1px); }
-
-  .divider{
-    display:flex;
-    align-items:center;
-    gap: 0.75rem;
-    color: #a39c8c;
-    font-size: 0.78rem;
-    margin: 0.6rem 0;
-  }
-  .divider::before, .divider::after{
-    content:"";
-    flex:1;
-    height:1px;
-    background: #ddd5c3;
-  }
-
-  .footer-note{
-    text-align:center;
-    font-size: 0.88rem;
-    color: var(--ink-soft);
-    margin-top: 1.6rem;
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    .frond-line{ animation: none; stroke-dashoffset: 0; }
-  }
+  .footer-note{ text-align:center; font-size: 0.88rem; color: var(--ink-soft); margin-top: 1.6rem; }
 
   @media (max-width: 860px){
     .page{ flex-direction: column; }
@@ -262,22 +74,18 @@
 </style>
 </head>
 <body>
-
 <div class="page">
 
   <div class="brand-panel">
     <div class="eyebrow">PlantCareLog</div>
-
     <div class="brand-copy">
       <h1>Every leaf remembers being watered.</h1>
       <p>Sign in to check today's tasks, log a watering, and see how your collection is growing.</p>
     </div>
-
     <div class="streak">
       <svg viewBox="0 0 24 24" class="rings"><circle cx="12" cy="12" r="9" fill="none" stroke-width="1.4"/><circle cx="12" cy="12" r="5.4" fill="none" stroke-width="1.4"/></svg>
-      14-day watering streak
+      Track every watering, in one place
     </div>
-
     <div class="frond-wrap" aria-hidden="true">
       <svg viewBox="0 0 300 340" xmlns="http://www.w3.org/2000/svg">
         <path class="frond-line" d="M150 330 C140 260 165 200 150 150 C138 105 155 60 150 10" />
@@ -297,15 +105,35 @@
       <h2>Welcome back</h2>
       <p class="sub">Sign in to your PlantCareLog account.</p>
 
-      <form action="#" method="post" autocomplete="on">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+          <ul class="nonfield-errors">
+            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+
         <div class="field">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@example.com" required autocomplete="email">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            <ul class="errorlist">{% for e in form.username.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
         </div>
 
         <div class="field">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password">
+          <label for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+          {% if form.password.errors %}
+            <ul class="errorlist">{% for e in form.password.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+          {% endif %}
         </div>
 
         <div class="row-between">
@@ -316,14 +144,13 @@
           <a href="#">Forgot password?</a>
         </div>
 
-        <button type="submit" class="submit">Sign in</button>
+        <button type="submit" class="btn-primary">Sign in</button>
       </form>
 
-      <p class="footer-note">New here? <a href="#">Create an account</a></p>
+      <p class="footer-note">New here? <a href="{% url 'register' %}">Create an account</a></p>
     </div>
   </div>
 
 </div>
-
 </body>
 </html>
