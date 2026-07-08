@@ -9,8 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 <style>
-  body{ background: var(--paper); }
-
   .topbar{
     display:flex; align-items:center; justify-content:space-between;
     padding: 1.1rem 2rem; background: var(--forest-deep); color: var(--paper);
@@ -87,6 +85,7 @@
 <div class="topbar">
   <div class="brand">PlantCareLog <span class="tag">Admin</span></div>
   <nav>
+    <a href="{% url 'manage_users' %}">Manage users</a>
     <a href="{% url 'dashboard' %}">User view</a>
     <span>{{ user.username }}</span>
     <form method="post" action="{% url 'logout' %}" style="display:inline;">
@@ -98,7 +97,13 @@
 
 <main>
   <h1>Admin dashboard</h1>
-  <p class="sub">A quick-glance overview of PlantCareLog's user base, separate from the Django admin.</p>
+  <p class="sub">A quick-glance overview of PlantCareLog's user base, managed through a custom interface.</p>
+
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+  {% endif %}
 
   <div class="cards">
     <div class="stat-card">
@@ -142,8 +147,7 @@
   <div class="panel">
     <h2>Quick links</h2>
     <ul class="menu-list">
-      <li><a href="/admin/">Django admin (manage all models) <span class="arrow">→</span></a></li>
-      <li><a href="/admin/auth/user/">Manage users <span class="arrow">→</span></a></li>
+      <li><a href="{% url 'manage_users' %}">Manage users <span class="arrow">→</span></a></li>
       <li><a href="{% url 'dashboard' %}">View site as a regular user <span class="arrow">→</span></a></li>
     </ul>
   </div>

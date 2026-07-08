@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if plant %}Edit {{ plant.name }}{% else %}Add Plant{% endif %} · PlantCareLog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding: 1.1rem 2rem; background: var(--forest); color: var(--paper); }
+  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size: 1.15rem; }
+  .topbar nav a{ color: var(--sage); margin-left: 1.2rem; }
+  .topbar nav a:hover{ color: var(--paper); }
+
+  main{ max-width: 560px; margin: 0 auto; padding: 2.6rem 2rem 4rem; }
+  main h1{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.7rem; margin: 0 0 1.6rem 0; }
+
+  .panel{ background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px; padding: 1.6rem 1.7rem; }
+
+  textarea{
+    width: 100%; padding: 0.72rem 0.85rem; font-family:'Inter', sans-serif; font-size: 0.95rem;
+    color: var(--ink); background: var(--paper-dim); border: 1.5px solid transparent;
+    border-radius: 8px; outline: none; resize: vertical; min-height: 90px;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  textarea:focus{ border-color: var(--moss); background: #fdfbf6; }
+
+  .btn-row{ margin-top: 1.2rem; display:flex; gap: 0.7rem; align-items:center; }
+  .btn-cancel{ padding: 0.82rem 1.1rem; border-radius: 8px; border: 1px solid var(--paper-dim); background: #fff; color: var(--ink); font-size: 0.9rem; text-decoration:none; }
+  .btn-cancel:hover{ text-decoration:none; background: var(--paper-dim); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">PlantCareLog</div>
+  <nav><a href="{% url 'plant_list' %}">My plants</a></nav>
+</div>
+
+<main>
+  <h1>{% if plant %}Edit {{ plant.name }}{% else %}Add a new plant{% endif %}</h1>
+
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+  {% endif %}
+
+  <div class="panel">
+    <form method="post">
+      {% csrf_token %}
+      <div class="field">
+        <label>Name</label>
+        <input type="text" name="name" value="{{ plant.name|default:'' }}" required>
+      </div>
+      <div class="field">
+        <label>Species</label>
+        <input type="text" name="species" value="{{ plant.species|default:'' }}">
+      </div>
+      <div class="field">
+        <label>Location</label>
+        <input type="text" name="location" value="{{ plant.location|default:'' }}">
+      </div>
+      <div class="field">
+        <label>Watering interval (days)</label>
+        <input type="number" name="watering_interval" min="1" value="{{ plant.watering_interval|default:'' }}">
+      </div>
+      <div class="field">
+        <label>Notes</label>
+        <textarea name="notes">{{ plant.notes|default:'' }}</textarea>
+      </div>
+
+      <div class="btn-row">
+        <button type="submit" class="btn-primary" style="width:auto;">{% if plant %}Save changes{% else %}Add plant{% endif %}</button>
+        <a href="{% url 'plant_list' %}" class="btn-cancel">Cancel</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+</body>
+</html>

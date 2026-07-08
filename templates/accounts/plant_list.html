@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Plants · PlantCareLog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding: 1.1rem 2rem; background: var(--forest); color: var(--paper); }
+  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size: 1.15rem; }
+  .topbar nav{ display:flex; align-items:center; gap: 1.4rem; font-size: 0.88rem; }
+  .topbar nav a{ color: var(--sage); }
+  .topbar nav a:hover{ color: var(--paper); }
+  .topbar .signout{ background: transparent; border: 1px solid var(--sage); color: var(--paper); padding: 0.4rem 0.85rem; border-radius: 6px; font-size: 0.82rem; cursor:pointer; }
+  .topbar .signout:hover{ background: rgba(255,255,255,0.08); }
+
+  main{ max-width: 900px; margin: 0 auto; padding: 2.6rem 2rem 4rem; }
+  main h1{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.9rem; margin: 0 0 0.3rem 0; }
+  .sub{ color: var(--ink-soft); margin: 0 0 1.6rem 0; }
+
+  .btn-add{
+    display:inline-block; margin-bottom: 1.6rem; padding: 0.72rem 1.1rem; border-radius: 8px;
+    background: var(--moss); color: var(--paper); font-weight:600; text-decoration:none; font-size: 0.9rem;
+  }
+  .btn-add:hover{ background: var(--moss-dark); text-decoration:none; }
+
+  .grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
+  .plant-card{ background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px; padding: 1.2rem 1.3rem; text-decoration:none; color: var(--ink); display:block; }
+  .plant-card:hover{ border-color: var(--sage); text-decoration:none; }
+  .plant-card h3{ font-family:'Fraunces', serif; margin: 0 0 0.3rem 0; font-size: 1.1rem; color: var(--ink); }
+  .plant-card p{ margin: 0.15rem 0; font-size: 0.84rem; color: var(--ink-soft); }
+
+  .empty-state{ border: 1.5px dashed var(--paper-dim); border-radius: 10px; padding: 2.4rem; text-align:center; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">PlantCareLog</div>
+  <nav>
+    <a href="{% url 'dashboard' %}">Dashboard</a>
+    <a href="{% url 'profile' %}">My profile</a>
+    {% if user.is_staff %}<a href="{% url 'admin_dashboard' %}">Admin</a>{% endif %}
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="signout">Sign out</button>
+    </form>
+  </nav>
+</div>
+
+<main>
+  <h1>My plants</h1>
+  <p class="sub">Track each plant's watering schedule and health history.</p>
+
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+  {% endif %}
+
+  <a href="{% url 'plant_create' %}" class="btn-add">+ Add a plant</a>
+
+  {% if plants %}
+  <div class="grid">
+    {% for plant in plants %}
+    <a class="plant-card" href="{% url 'plant_detail' plant.plant_id %}">
+      <h3>{{ plant.name }}</h3>
+      <p>{{ plant.species|default:"Species unknown" }}</p>
+      <p>{{ plant.location|default:"No location set" }}</p>
+      {% if plant.last_watered_on %}<p>Last watered {{ plant.last_watered_on|date:"M d, Y" }}</p>{% else %}<p>Never watered yet</p>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <p>No plants yet. Add your first one above.</p>
+  </div>
+  {% endif %}
+</main>
+
+</body>
+</html>

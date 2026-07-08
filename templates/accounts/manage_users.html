@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Users · PlantCareLog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/theme.css' %}">
+<style>
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 1.1rem 2rem; background: var(--forest-deep); color: var(--paper);
+  }
+  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size: 1.15rem; }
+  .topbar .brand .tag{
+    font-family:'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--clay-soft);
+    margin-left: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .topbar nav{ display:flex; align-items:center; gap: 1.4rem; font-size: 0.88rem; }
+  .topbar nav a{ color: var(--sage); }
+  .topbar nav a:hover{ color: var(--paper); }
+  .topbar .signout{
+    background: transparent; border: 1px solid var(--sage); color: var(--paper);
+    padding: 0.4rem 0.85rem; border-radius: 6px; font-size: 0.82rem; cursor:pointer;
+  }
+  .topbar .signout:hover{ background: rgba(255,255,255,0.08); }
+
+  main{ max-width: 1100px; margin: 0 auto; padding: 2.6rem 2rem 4rem; }
+  main h1{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.9rem; margin: 0 0 0.3rem 0; }
+  main .sub{ color: var(--ink-soft); margin: 0 0 1.8rem 0; }
+
+  .search-row{ margin-bottom: 1.4rem; display:flex; align-items:center; }
+  .search-row input[type="text"]{
+    width: 100%; max-width: 340px; padding: 0.72rem 0.85rem; border: 1.5px solid transparent;
+    background: var(--paper-dim); border-radius: 8px; font-size: 0.9rem; font-family: inherit; outline:none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .search-row input[type="text"]:focus{ border-color: var(--moss); background: #fdfbf6; }
+  .search-row button{
+    padding: 0.72rem 1.1rem; border-radius: 8px; border:none;
+    background: var(--moss); color: var(--paper); font-weight:600; font-size: 0.85rem; cursor:pointer; margin-left: 0.5rem;
+  }
+  .search-row button:hover{ background: var(--moss-dark); }
+
+  .panel{
+    background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px;
+    padding: 1.5rem 1.6rem; margin-bottom: 1.6rem; overflow-x:auto;
+  }
+
+  table{ width:100%; border-collapse: collapse; font-size: 0.87rem; }
+  th{
+    text-align:left; font-family:'JetBrains Mono', monospace; font-size: 0.66rem;
+    letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-soft);
+    padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--paper-dim); white-space:nowrap;
+  }
+  td{ padding: 0.6rem 0.6rem; border-bottom: 1px solid var(--paper-dim); vertical-align: middle; }
+  tr:last-child td{ border-bottom: none; }
+
+  .badge{
+    display:inline-block; padding: 0.15rem 0.5rem; border-radius: 999px;
+    font-size: 0.7rem; font-weight: 600; margin-right: 0.25rem;
+  }
+  .badge-active{ background: var(--success-bg); color: var(--success); }
+  .badge-inactive{ background: var(--danger-bg); color: var(--danger); }
+  .badge-staff{ background: var(--clay-soft); color: #6b3d1c; }
+  .badge-you{ background: var(--paper-dim); color: var(--ink-soft); }
+
+  .actions{ display:flex; gap: 0.4rem; flex-wrap: wrap; }
+  .actions form{ display:inline; }
+  .btn{
+    font-size: 0.76rem; padding: 0.32rem 0.6rem; border-radius: 6px; border: 1px solid var(--paper-dim);
+    background: var(--paper-dim); color: var(--ink); cursor:pointer; font-family: inherit;
+  }
+  .btn:hover{ background: var(--sage); color: var(--forest-deep); }
+  .btn-danger{ border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+  .btn-danger:hover{ background: var(--danger); color: #fff; }
+  .btn-edit{ text-decoration:none; display:inline-block; }
+
+  @media (max-width: 720px){
+    table{ font-size: 0.78rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">PlantCareLog <span class="tag">Admin</span></div>
+  <nav>
+    <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+    <a href="{% url 'dashboard' %}">User view</a>
+    <span>{{ user.username }}</span>
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" class="signout">Sign out</button>
+    </form>
+  </nav>
+</div>
+
+<main>
+  <h1>Manage users</h1>
+  <p class="sub">Search, edit, activate/deactivate, promote, or remove accounts.</p>
+
+  {% if messages %}
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+  {% endfor %}
+  {% endif %}
+
+  <form class="search-row" method="get">
+    <input type="text" name="q" placeholder="Search by username, email, or name..." value="{{ query }}">
+    <button type="submit">Search</button>
+  </form>
+
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th><th>Email</th><th>Name</th><th>Joined</th><th>Status</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.username }}</td>
+          <td>{{ u.email|default:"—" }}</td>
+          <td>{{ u.first_name }} {{ u.last_name }}</td>
+          <td>{{ u.date_joined|date:"M d, Y" }}</td>
+          <td>
+            {% if u == user %}<span class="badge badge-you">You</span>{% endif %}
+            {% if u.is_active %}<span class="badge badge-active">Active</span>{% else %}<span class="badge badge-inactive">Inactive</span>{% endif %}
+            {% if u.is_staff %}<span class="badge badge-staff">Staff</span>{% endif %}
+          </td>
+          <td>
+            <div class="actions">
+              <a class="btn btn-edit" href="{% url 'edit_user' u.id %}">Edit</a>
+              {% if u != user %}
+              <form method="post" action="{% url 'toggle_active' u.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn">{% if u.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+              </form>
+              <form method="post" action="{% url 'toggle_staff' u.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn">{% if u.is_staff %}Remove staff{% else %}Make staff{% endif %}</button>
+              </form>
+              <form method="post" action="{% url 'delete_user' u.id %}" onsubmit="return confirm('Delete {{ u.username }}? This cannot be undone.');">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No users found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main>
+
+</body>
+</html>
