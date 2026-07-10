@@ -30,6 +30,7 @@
   .grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
   .plant-card{ background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px; padding: 1.2rem 1.3rem; text-decoration:none; color: var(--ink); display:block; }
   .plant-card:hover{ border-color: var(--sage); text-decoration:none; }
+  .plant-card img{ width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:0.7rem; }
   .plant-card h3{ font-family:'Fraunces', serif; margin: 0 0 0.3rem 0; font-size: 1.1rem; color: var(--ink); }
   .plant-card p{ margin: 0.15rem 0; font-size: 0.84rem; color: var(--ink-soft); }
 
@@ -67,6 +68,9 @@
   <div class="grid">
     {% for plant in plants %}
     <a class="plant-card" href="{% url 'plant_detail' plant.plant_id %}">
+      {% if plant.photo %}
+      <img src="{{ plant.photo.url }}" alt="{{ plant.name }}">
+      {% endif %}
       <h3>{{ plant.name }}</h3>
       <p>{{ plant.species|default:"Species unknown" }}</p>
       <p>{{ plant.location|default:"No location set" }}</p>

@@ -31,6 +31,7 @@ class Plant(models.Model):
     watering_interval = models.IntegerField(blank=True, null=True, help_text="Days between watering")
     last_watered_on = models.DateTimeField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+    photo = models.ImageField(upload_to="plant_photos/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -67,6 +68,7 @@ class HealthLog(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     plant = models.ForeignKey(Plant, on_delete=models.CASCADE, related_name="health_logs", db_column="plant_id")
     health_status = models.CharField(max_length=50, choices=STATUS_CHOICES)
+    photo = models.ImageField(upload_to="health_photos/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

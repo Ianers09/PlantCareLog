@@ -161,6 +161,7 @@ def plant_create_view(request):
         location = request.POST.get("location", "").strip()
         watering_interval = request.POST.get("watering_interval") or None
         notes = request.POST.get("notes", "").strip()
+        photo = request.FILES.get("photo")
 
         if not name:
             messages.error(request, "Plant name is required.")
@@ -172,6 +173,7 @@ def plant_create_view(request):
                 location=location or None,
                 watering_interval=watering_interval,
                 notes=notes or None,
+                photo=photo,
             )
             messages.success(request, f"Added {name} to your plants.")
             return redirect("plant_list")
@@ -190,6 +192,9 @@ def plant_edit_view(request, plant_id):
         watering_interval = request.POST.get("watering_interval")
         plant.watering_interval = int(watering_interval) if watering_interval else None
         plant.notes = request.POST.get("notes", "").strip() or None
+
+        if request.FILES.get("photo"):
+            plant.photo = request.FILES["photo"]
 
         if not plant.name:
             messages.error(request, "Plant name is required.")
@@ -250,8 +255,9 @@ def watering_log_delete_view(request, plant_id, log_id):
 def health_log_add_view(request, plant_id):
     plant = get_object_or_404(Plant, pk=plant_id, owner=request.user.profile)
     status = request.POST.get("health_status", "").strip()
+    photo = request.FILES.get("photo")
     if status:
-        HealthLog.objects.create(plant=plant, health_status=status)
+        HealthLog.objects.create(plant=plant, health_status=status, photo=photo)
         messages.success(request, "Health status logged.")
     return redirect("plant_detail", plant_id=plant.plant_id)
 

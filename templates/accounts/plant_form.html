@@ -27,9 +27,16 @@
   }
   textarea:focus{ border-color: var(--moss); background: #fdfbf6; }
 
+  input[type="file"]{
+    width: 100%; padding: 0.6rem 0.2rem; font-family: inherit; font-size: 0.88rem; color: var(--ink-soft);
+  }
+
   .btn-row{ margin-top: 1.2rem; display:flex; gap: 0.7rem; align-items:center; }
   .btn-cancel{ padding: 0.82rem 1.1rem; border-radius: 8px; border: 1px solid var(--paper-dim); background: #fff; color: var(--ink); font-size: 0.9rem; text-decoration:none; }
   .btn-cancel:hover{ text-decoration:none; background: var(--paper-dim); }
+
+  .current-photo{ margin-bottom: 0.6rem; }
+  .current-photo img{ max-width: 160px; border-radius: 8px; display:block; border: 1px solid var(--paper-dim); }
 </style>
 </head>
 <body>
@@ -49,7 +56,7 @@
   {% endif %}
 
   <div class="panel">
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="field">
         <label>Name</label>
@@ -70,6 +77,15 @@
       <div class="field">
         <label>Notes</label>
         <textarea name="notes">{{ plant.notes|default:'' }}</textarea>
+      </div>
+      <div class="field">
+        <label>Photo</label>
+        {% if plant.photo %}
+        <div class="current-photo">
+          <img src="{{ plant.photo.url }}" alt="{{ plant.name }}">
+        </div>
+        {% endif %}
+        <input type="file" name="photo" accept="image/*">
       </div>
 
       <div class="btn-row">
