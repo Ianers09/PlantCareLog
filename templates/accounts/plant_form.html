@@ -60,23 +60,23 @@
       {% csrf_token %}
       <div class="field">
         <label>Name</label>
-        <input type="text" name="name" value="{{ plant.name|default:'' }}" required>
+        <input type="text" name="name" value="{% firstof form_data.name plant.name '' %}" required>
       </div>
       <div class="field">
         <label>Species</label>
-        <input type="text" name="species" value="{{ plant.species|default:'' }}">
+        <input type="text" name="species" value="{% firstof form_data.species plant.species '' %}">
       </div>
       <div class="field">
         <label>Location</label>
-        <input type="text" name="location" value="{{ plant.location|default:'' }}">
+        <input type="text" name="location" value="{% firstof form_data.location plant.location '' %}">
       </div>
       <div class="field">
         <label>Watering interval (days)</label>
-        <input type="number" name="watering_interval" min="1" value="{{ plant.watering_interval|default:'' }}">
+        <input type="number" name="watering_interval" min="1" value="{% firstof form_data.watering_interval plant.watering_interval '' %}">
       </div>
       <div class="field">
         <label>Notes</label>
-        <textarea name="notes">{{ plant.notes|default:'' }}</textarea>
+        <textarea name="notes">{% firstof form_data.notes plant.notes '' %}</textarea>
       </div>
       <div class="field">
         <label>Photo</label>

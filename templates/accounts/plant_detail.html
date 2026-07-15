@@ -50,6 +50,12 @@
   .badge-Healthy{ background: var(--success-bg); color: var(--success); }
   .badge-Wilting{ background: var(--danger-bg); color: var(--danger); }
   .badge-Recovering{ background: var(--clay-soft); color: #6b3d1c; }
+
+  .status-pill{ display:inline-block; font-size: 0.7rem; font-weight:600; padding: 0.15rem 0.55rem; border-radius: 999px; margin-top: 0.4rem; }
+  .status-overdue{ background: var(--danger-bg); color: var(--danger); }
+  .status-due_soon{ background: var(--clay-soft); color: #6b3d1c; }
+  .status-never{ background: var(--paper-dim); color: var(--ink-soft); }
+  .status-ok{ background: var(--success-bg); color: var(--success); }
 </style>
 </head>
 <body>
@@ -73,6 +79,15 @@
       {% endif %}
       <h1>{{ plant.name }}</h1>
       <p class="meta">{{ plant.species|default:"Species unknown" }} · {{ plant.location|default:"No location set" }}{% if plant.watering_interval %} · Water every {{ plant.watering_interval }} days{% endif %}</p>
+      {% if plant.watering_status == "overdue" %}
+      <span class="status-pill status-overdue">Overdue for watering</span>
+      {% elif plant.watering_status == "due_soon" %}
+      <span class="status-pill status-due_soon">Due today</span>
+      {% elif plant.watering_status == "never" %}
+      <span class="status-pill status-never">Never watered</span>
+      {% else %}
+      <span class="status-pill status-ok">On schedule</span>
+      {% endif %}
     </div>
     <div class="head-actions">
       <a class="btn" href="{% url 'plant_edit' plant.plant_id %}">Edit</a>

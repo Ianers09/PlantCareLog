@@ -5,6 +5,7 @@ from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -65,7 +66,30 @@ def logout_view(request):
 
 @login_required
 def dashboard_view(request):
-    return render(request, "accounts/dashboard.html")
+    """Dashboard integrates the core Plant/WateringLog/HealthLog feature into
+    an at-a-glance reminders view: which plants are overdue, due soon, or have
+    never been watered, plus the most recent health status changes."""
+    plants = list(request.user.profile.plants.all())
+
+    overdue_plants = [p for p in plants if p.watering_status == Plant.STATUS_OVERDUE]
+    due_soon_plants = [p for p in plants if p.watering_status == Plant.STATUS_DUE_SOON]
+    never_watered_plants = [p for p in plants if p.watering_status == Plant.STATUS_NEVER]
+
+    recent_health_logs = (
+        HealthLog.objects.filter(plant__owner=request.user.profile)
+        .select_related("plant")
+        .order_by("-created_at")[:5]
+    )
+
+    context = {
+        "total_plants": len(plants),
+        "overdue_plants": overdue_plants,
+        "due_soon_plants": due_soon_plants,
+        "never_watered_plants": never_watered_plants,
+        "needs_attention_count": len(overdue_plants) + len(due_soon_plants),
+        "recent_health_logs": recent_health_logs,
+    }
+    return render(request, "accounts/dashboard.html", context)
 
 
 @staff_member_required
@@ -149,8 +173,26 @@ def delete_user_view(request, user_id):
 
 @login_required
 def plant_list_view(request):
-    plants = request.user.profile.plants.all().order_by("-created_at")
-    return render(request, "accounts/plant_list.html", {"plants": plants})
+    plants_qs = request.user.profile.plants.all().order_by("-created_at")
+
+    query = request.GET.get("q", "").strip()
+    if query:
+        plants_qs = plants_qs.filter(
+            Q(name__icontains=query) | Q(species__icontains=query) | Q(location__icontains=query)
+        )
+
+    status_filter = request.GET.get("status", "").strip()
+    valid_statuses = {Plant.STATUS_OVERDUE, Plant.STATUS_DUE_SOON, Plant.STATUS_NEVER, Plant.STATUS_OK}
+    plants = list(plants_qs)
+    if status_filter in valid_statuses:
+        plants = [p for p in plants if p.watering_status == status_filter]
+
+    context = {
+        "plants": plants,
+        "query": query,
+        "status_filter": status_filter,
+    }
+    return render(request, "accounts/plant_list.html", context)
 
 
 @login_required
@@ -159,24 +201,51 @@ def plant_create_view(request):
         name = request.POST.get("name", "").strip()
         species = request.POST.get("species", "").strip()
         location = request.POST.get("location", "").strip()
-        watering_interval = request.POST.get("watering_interval") or None
+        watering_interval = request.POST.get("watering_interval", "").strip() or None
         notes = request.POST.get("notes", "").strip()
         photo = request.FILES.get("photo")
 
         if not name:
             messages.error(request, "Plant name is required.")
+        elif watering_interval and (not watering_interval.isdigit() or int(watering_interval) <= 0):
+            messages.error(request, "Watering interval must be a positive number of days.")
+        elif request.user.profile.plants.filter(name__iexact=name).exists():
+            messages.error(request, f'You already have a plant named "{name}". Choose a different name.')
         else:
-            Plant.objects.create(
-                owner=request.user.profile,
-                name=name,
-                species=species or None,
-                location=location or None,
-                watering_interval=watering_interval,
-                notes=notes or None,
-                photo=photo,
-            )
-            messages.success(request, f"Added {name} to your plants.")
-            return redirect("plant_list")
+            try:
+                Plant.objects.create(
+                    owner=request.user.profile,
+                    name=name,
+                    species=species or None,
+                    location=location or None,
+                    watering_interval=watering_interval,
+                    notes=notes or None,
+                    photo=photo,
+                )
+            except IntegrityError:
+                # Safety net for a race condition where two requests create the
+                # same duplicate name at the same time (the unique constraint
+                # on the model catches what the check above might miss).
+                messages.error(request, f'You already have a plant named "{name}". Choose a different name.')
+            else:
+                messages.success(request, f"Added {name} to your plants.")
+                return redirect("plant_list")
+
+        # Re-render with the submitted values so the user doesn't lose their input.
+        return render(
+            request,
+            "accounts/plant_form.html",
+            {
+                "plant": None,
+                "form_data": {
+                    "name": name,
+                    "species": species,
+                    "location": location,
+                    "watering_interval": watering_interval,
+                    "notes": notes,
+                },
+            },
+        )
 
     return render(request, "accounts/plant_form.html", {"plant": None})
 
@@ -186,22 +255,32 @@ def plant_edit_view(request, plant_id):
     plant = get_object_or_404(Plant, pk=plant_id, owner=request.user.profile)
 
     if request.method == "POST":
-        plant.name = request.POST.get("name", "").strip()
-        plant.species = request.POST.get("species", "").strip() or None
-        plant.location = request.POST.get("location", "").strip() or None
-        watering_interval = request.POST.get("watering_interval")
-        plant.watering_interval = int(watering_interval) if watering_interval else None
-        plant.notes = request.POST.get("notes", "").strip() or None
+        name = request.POST.get("name", "").strip()
+        watering_interval = request.POST.get("watering_interval", "").strip() or None
 
-        if request.FILES.get("photo"):
-            plant.photo = request.FILES["photo"]
-
-        if not plant.name:
+        if not name:
             messages.error(request, "Plant name is required.")
+        elif watering_interval and (not watering_interval.isdigit() or int(watering_interval) <= 0):
+            messages.error(request, "Watering interval must be a positive number of days.")
+        elif request.user.profile.plants.filter(name__iexact=name).exclude(pk=plant.pk).exists():
+            messages.error(request, f'You already have a plant named "{name}". Choose a different name.')
         else:
-            plant.save()
-            messages.success(request, f"Updated {plant.name}.")
-            return redirect("plant_detail", plant_id=plant.plant_id)
+            plant.name = name
+            plant.species = request.POST.get("species", "").strip() or None
+            plant.location = request.POST.get("location", "").strip() or None
+            plant.watering_interval = int(watering_interval) if watering_interval else None
+            plant.notes = request.POST.get("notes", "").strip() or None
+
+            if request.FILES.get("photo"):
+                plant.photo = request.FILES["photo"]
+
+            try:
+                plant.save()
+            except IntegrityError:
+                messages.error(request, f'You already have a plant named "{name}". Choose a different name.')
+            else:
+                messages.success(request, f"Updated {plant.name}.")
+                return redirect("plant_detail", plant_id=plant.plant_id)
 
     return render(request, "accounts/plant_form.html", {"plant": plant})
 
@@ -232,6 +311,11 @@ def plant_detail_view(request, plant_id):
 @require_POST
 def watering_log_add_view(request, plant_id):
     plant = get_object_or_404(Plant, pk=plant_id, owner=request.user.profile)
+
+    if plant.watered_today():
+        messages.error(request, f"{plant.name} has already been logged as watered today.")
+        return redirect("plant_detail", plant_id=plant.plant_id)
+
     note = request.POST.get("note", "").strip()
     WateringLog.objects.create(plant=plant, note=note or None)
     plant.last_watered_on = timezone.now()

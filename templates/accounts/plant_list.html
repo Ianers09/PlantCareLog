@@ -35,6 +35,22 @@
   .plant-card p{ margin: 0.15rem 0; font-size: 0.84rem; color: var(--ink-soft); }
 
   .empty-state{ border: 1.5px dashed var(--paper-dim); border-radius: 10px; padding: 2.4rem; text-align:center; color: var(--ink-soft); }
+
+  .filter-bar{ display:flex; gap: 0.6rem; margin-bottom: 1.4rem; flex-wrap: wrap; align-items:center; }
+  .filter-bar input[type="text"], .filter-bar select{
+    padding: 0.62rem 0.8rem; border: 1.5px solid var(--paper-dim); background: #fff;
+    border-radius: 8px; font-size: 0.85rem; font-family: inherit; outline:none; min-width: 180px;
+  }
+  .filter-bar input[type="text"]:focus, .filter-bar select:focus{ border-color: var(--moss); }
+  .filter-bar button{ padding: 0.62rem 1rem; border-radius: 8px; border:none; background: var(--moss); color: var(--paper); font-size: 0.85rem; font-weight:600; cursor:pointer; }
+  .filter-bar button:hover{ background: var(--moss-dark); }
+  .filter-bar .clear-link{ font-size: 0.82rem; color: var(--ink-soft); }
+
+  .status-pill{ display:inline-block; font-size: 0.68rem; font-weight:600; padding: 0.15rem 0.55rem; border-radius: 999px; margin-top: 0.3rem; }
+  .status-overdue{ background: var(--danger-bg); color: var(--danger); }
+  .status-due_soon{ background: var(--clay-soft); color: #6b3d1c; }
+  .status-never{ background: var(--paper-dim); color: var(--ink-soft); }
+  .status-ok{ background: var(--success-bg); color: var(--success); }
 </style>
 </head>
 <body>
@@ -64,6 +80,19 @@
 
   <a href="{% url 'plant_create' %}" class="btn-add">+ Add a plant</a>
 
+  <form class="filter-bar" method="get">
+    <input type="text" name="q" placeholder="Search name, species, location..." value="{{ query }}">
+    <select name="status">
+      <option value="" {% if not status_filter %}selected{% endif %}>All statuses</option>
+      <option value="overdue" {% if status_filter == "overdue" %}selected{% endif %}>Overdue</option>
+      <option value="due_soon" {% if status_filter == "due_soon" %}selected{% endif %}>Due today</option>
+      <option value="never" {% if status_filter == "never" %}selected{% endif %}>Never watered</option>
+      <option value="ok" {% if status_filter == "ok" %}selected{% endif %}>On schedule</option>
+    </select>
+    <button type="submit">Filter</button>
+    {% if query or status_filter %}<a class="clear-link" href="{% url 'plant_list' %}">Clear</a>{% endif %}
+  </form>
+
   {% if plants %}
   <div class="grid">
     {% for plant in plants %}
@@ -75,12 +104,25 @@
       <p>{{ plant.species|default:"Species unknown" }}</p>
       <p>{{ plant.location|default:"No location set" }}</p>
       {% if plant.last_watered_on %}<p>Last watered {{ plant.last_watered_on|date:"M d, Y" }}</p>{% else %}<p>Never watered yet</p>{% endif %}
+      {% if plant.watering_status == "overdue" %}
+      <span class="status-pill status-overdue">Overdue</span>
+      {% elif plant.watering_status == "due_soon" %}
+      <span class="status-pill status-due_soon">Due today</span>
+      {% elif plant.watering_status == "never" %}
+      <span class="status-pill status-never">Never watered</span>
+      {% else %}
+      <span class="status-pill status-ok">On schedule</span>
+      {% endif %}
     </a>
     {% endfor %}
   </div>
   {% else %}
   <div class="empty-state">
+    {% if query or status_filter %}
+    <p>No plants match your search or filter.</p>
+    {% else %}
     <p>No plants yet. Add your first one above.</p>
+    {% endif %}
   </div>
   {% endif %}
 </main>

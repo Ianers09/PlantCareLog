@@ -27,6 +27,24 @@
 
   main h1{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.9rem; margin: 0 0 0.3rem 0; }
   main .sub{ color: var(--ink-soft); margin: 0 0 2rem 0; }
+
+  .stats-row{ display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.8rem; }
+  .stat-card{ background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px; padding: 1rem 1.2rem; }
+  .stat-card .num{ font-family:'Fraunces', serif; font-size: 1.7rem; color: var(--forest); }
+  .stat-card .label{ font-size: 0.8rem; color: var(--ink-soft); }
+  .stat-card.warn .num{ color: var(--danger); }
+
+  .panel{ background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px; padding: 1.3rem 1.4rem; margin-bottom: 1.2rem; }
+  .panel h2{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.05rem; margin: 0 0 0.9rem 0; }
+  .reminder-row{ display:flex; justify-content:space-between; align-items:center; padding: 0.55rem 0; border-bottom: 1px solid var(--paper-dim); font-size: 0.88rem; }
+  .reminder-row:last-child{ border-bottom:none; }
+  .reminder-row a{ color: var(--ink); font-weight:600; }
+  .pill{ font-size: 0.7rem; font-weight:600; padding: 0.15rem 0.55rem; border-radius: 999px; }
+  .pill-overdue{ background: var(--danger-bg); color: var(--danger); }
+  .pill-due_soon{ background: var(--clay-soft); color: #6b3d1c; }
+  .pill-never{ background: var(--paper-dim); color: var(--ink-soft); }
+  .empty-note{ font-size: 0.85rem; color: var(--ink-soft); margin:0; }
+  .see-all{ display:inline-block; margin-top: 1rem; font-size: 0.85rem; }
 </style>
 </head>
 <body>
@@ -54,6 +72,62 @@
   <div class="alert alert-{{ message.tags }}">{{ message }}</div>
   {% endfor %}
   {% endif %}
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="num">{{ total_plants }}</div>
+      <div class="label">Total plants</div>
+    </div>
+    <div class="stat-card {% if needs_attention_count %}warn{% endif %}">
+      <div class="num">{{ needs_attention_count }}</div>
+      <div class="label">Need watering soon</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{{ never_watered_plants|length }}</div>
+      <div class="label">Never watered</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Watering reminders</h2>
+    {% if overdue_plants or due_soon_plants %}
+      {% for plant in overdue_plants %}
+      <div class="reminder-row">
+        <a href="{% url 'plant_detail' plant.plant_id %}">{{ plant.name }}</a>
+        <span class="pill pill-overdue">Overdue</span>
+      </div>
+      {% endfor %}
+      {% for plant in due_soon_plants %}
+      <div class="reminder-row">
+        <a href="{% url 'plant_detail' plant.plant_id %}">{{ plant.name }}</a>
+        <span class="pill pill-due_soon">Due today</span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <p class="empty-note">Nothing needs watering right now. 🌿</p>
+    {% endif %}
+    {% if never_watered_plants %}
+      {% for plant in never_watered_plants %}
+      <div class="reminder-row">
+        <a href="{% url 'plant_detail' plant.plant_id %}">{{ plant.name }}</a>
+        <span class="pill pill-never">Never watered</span>
+      </div>
+      {% endfor %}
+    {% endif %}
+    <a class="see-all" href="{% url 'plant_list' %}">See all plants →</a>
+  </div>
+
+  <div class="panel">
+    <h2>Recent health updates</h2>
+    {% for log in recent_health_logs %}
+    <div class="reminder-row">
+      <a href="{% url 'plant_detail' log.plant.plant_id %}">{{ log.plant.name }}</a>
+      <span>{{ log.health_status }} · {{ log.created_at|date:"M d" }}</span>
+    </div>
+    {% empty %}
+    <p class="empty-note">No health logs recorded yet.</p>
+    {% endfor %}
+  </div>
 </main>
 
 </body>
