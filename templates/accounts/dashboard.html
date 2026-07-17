@@ -8,44 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/theme.css' %}">
-<style>
-  .topbar{
-    display:flex; align-items:center; justify-content:space-between;
-    padding: 1.1rem 2rem; background: var(--forest); color: var(--paper);
-  }
-  .topbar .brand{ font-family:'Fraunces', serif; font-weight:600; font-size: 1.15rem; }
-  .topbar nav{ display:flex; align-items:center; gap: 1.4rem; font-size: 0.88rem; }
-  .topbar nav a{ color: var(--sage); }
-  .topbar nav a:hover{ color: var(--paper); }
-  .topbar .signout{
-    background: transparent; border: 1px solid var(--sage); color: var(--paper);
-    padding: 0.4rem 0.85rem; border-radius: 6px; font-size: 0.82rem; cursor:pointer;
-  }
-  .topbar .signout:hover{ background: rgba(255,255,255,0.08); }
-
-  main{ max-width: 900px; margin: 0 auto; padding: 2.6rem 2rem 4rem; }
-
-  main h1{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.9rem; margin: 0 0 0.3rem 0; }
-  main .sub{ color: var(--ink-soft); margin: 0 0 2rem 0; }
-
-  .stats-row{ display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1.8rem; }
-  .stat-card{ background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px; padding: 1rem 1.2rem; }
-  .stat-card .num{ font-family:'Fraunces', serif; font-size: 1.7rem; color: var(--forest); }
-  .stat-card .label{ font-size: 0.8rem; color: var(--ink-soft); }
-  .stat-card.warn .num{ color: var(--danger); }
-
-  .panel{ background:#fff; border: 1px solid var(--paper-dim); border-radius: 10px; padding: 1.3rem 1.4rem; margin-bottom: 1.2rem; }
-  .panel h2{ font-family:'Fraunces', serif; font-weight: 500; font-size: 1.05rem; margin: 0 0 0.9rem 0; }
-  .reminder-row{ display:flex; justify-content:space-between; align-items:center; padding: 0.55rem 0; border-bottom: 1px solid var(--paper-dim); font-size: 0.88rem; }
-  .reminder-row:last-child{ border-bottom:none; }
-  .reminder-row a{ color: var(--ink); font-weight:600; }
-  .pill{ font-size: 0.7rem; font-weight:600; padding: 0.15rem 0.55rem; border-radius: 999px; }
-  .pill-overdue{ background: var(--danger-bg); color: var(--danger); }
-  .pill-due_soon{ background: var(--clay-soft); color: #6b3d1c; }
-  .pill-never{ background: var(--paper-dim); color: var(--ink-soft); }
-  .empty-note{ font-size: 0.85rem; color: var(--ink-soft); margin:0; }
-  .see-all{ display:inline-block; margin-top: 1rem; font-size: 0.85rem; }
-</style>
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
 </head>
 <body>
 
@@ -56,7 +19,7 @@
     <a href="{% url 'plant_list' %}">My plants</a>
     <a href="{% url 'profile' %}">My profile</a>
     {% if user.is_staff %}<a href="{% url 'admin_dashboard' %}">Admin dashboard</a>{% endif %}
-    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+    <form method="post" action="{% url 'logout' %}" class="logout-form">
       {% csrf_token %}
       <button type="submit" class="signout">Sign out</button>
     </form>

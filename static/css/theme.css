@@ -103,3 +103,9 @@ a:focus-visible, button:focus-visible, input:focus-visible{
 @media (prefers-reduced-motion: reduce){
   *{ animation: none !important; transition: none !important; }
 }
+
+/* ---------- Shared utility classes ---------- */
+.logout-form{ display:inline; }
+.btn-auto{ width:auto; }
+.muted-note{ margin:0; font-size:0.9rem; color: var(--ink-soft); }
+.empty-note{ font-size:0.85rem; color: var(--ink-soft); margin:0; }
